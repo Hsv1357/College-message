@@ -1,37 +1,31 @@
-
-stages {
+node {
     stage('Checkout') {
-        steps {
-            checkout scm
-        }
+        checkout scm
     }
 
     stage('Check Python') {
-        steps {
-            bat 'python --version'
-            bat 'python -m pip --version'
-        }
+        bat 'python --version'
+        bat 'python -m pip --version'
     }
 
     stage('Install Dependencies') {
-        steps {
+        if (fileExists('requirements.txt')) {
             bat 'python -m pip install -r requirements.txt'
+        } else {
+            error 'requirements.txt is missing from the project root.'
         }
     }
 
     stage('Run Tests') {
-        steps {
+        if (fileExists('tests') || fileExists('test_app.py')) {
+            bat 'python -m pip install pytest'
             bat 'python -m pytest'
+        } else {
+            echo 'No recognized test directory or test_app.py found. Skipping tests.'
         }
     }
-}
 
-post {
-    success {
+    stage('Complete') {
         echo 'College Message pipeline completed successfully!'
-    }
-
-    failure {
-        echo 'Build failed. Check the Console Output.'
     }
 }
