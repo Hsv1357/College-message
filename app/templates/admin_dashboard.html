@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Administrator Dashboard — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+  <div>
+    <h1 class="h3 fw-bold text-dark mb-1">Administrator Dashboard</h1>
+    <p class="text-muted mb-0">Overview of college accounts, roles, and system status</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('admin.create_account') }}" class="btn btn-primary d-flex align-items-center gap-2">
+      <i class="bi bi-person-plus-fill"></i>
+      <span>Create Account</span>
+    </a>
+  </div>
+</div>
+
+{% if firebase_status and not firebase_status.initialized %}
+  <div class="alert alert-warning shadow-sm mb-4" role="alert">
+    <div class="d-flex align-items-start gap-3">
+      <i class="bi bi-exclamation-triangle-fill fs-3 text-warning"></i>
+      <div>
+        <h5 class="alert-heading fw-bold mb-1">Firebase Admin SDK Credentials Required</h5>
+        <p class="mb-2 text-dark">
+          The application is running in configuration-ready mode. To sync with Cloud Firestore and Firebase Authentication, place your <code>service_account.json</code> file in the project root and ensure <code>GOOGLE_APPLICATION_CREDENTIALS</code> is set in <code>.env</code>.
+        </p>
+        <span class="badge bg-dark">Check README.md for step-by-step instructions</span>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<!-- Metric Statistics Cards -->
+<div class="row g-3 mb-4">
+  <!-- Total Students -->
+  <div class="col-12 col-sm-6 col-xl">
+    <div class="cc-stat-card">
+      <div>
+        <div class="cc-stat-title">Total Students</div>
+        <div class="cc-stat-value">{{ stats.total_students }}</div>
+        <a href="{{ url_for('admin.manage_students') }}" class="small text-decoration-none text-primary mt-2 d-inline-block">
+          View all students &rarr;
+        </a>
+      </div>
+      <div class="cc-stat-icon-wrapper cc-stat-icon-blue">
+        <i class="bi bi-people-fill"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Staff -->
+  <div class="col-12 col-sm-6 col-xl">
+    <div class="cc-stat-card">
+      <div>
+        <div class="cc-stat-title">Total Staff</div>
+        <div class="cc-stat-value">{{ stats.total_staff }}</div>
+        <a href="{{ url_for('admin.manage_staff') }}" class="small text-decoration-none text-teal mt-2 d-inline-block">
+          View all staff &rarr;
+        </a>
+      </div>
+      <div class="cc-stat-icon-wrapper cc-stat-icon-teal">
+        <i class="bi bi-person-badge-fill"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Parents -->
+  <div class="col-12 col-sm-6 col-xl">
+    <div class="cc-stat-card">
+      <div>
+        <div class="cc-stat-title">Total Parents</div>
+        <div class="cc-stat-value">{{ stats.total_parents }}</div>
+        <a href="{{ url_for('admin.manage_parents') }}" class="small text-decoration-none text-amber mt-2 d-inline-block">
+          View all parents &rarr;
+        </a>
+      </div>
+      <div class="cc-stat-icon-wrapper cc-stat-icon-amber">
+        <i class="bi bi-person-heart"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Accounts -->
+  <div class="col-12 col-sm-6 col-xl">
+    <div class="cc-stat-card">
+      <div>
+        <div class="cc-stat-title">Active Accounts</div>
+        <div class="cc-stat-value text-success">{{ stats.active_accounts }}</div>
+        <span class="small text-muted mt-2 d-inline-block">Operational</span>
+      </div>
+      <div class="cc-stat-icon-wrapper cc-stat-icon-green">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disabled Accounts -->
+  <div class="col-12 col-sm-6 col-xl">
+    <div class="cc-stat-card">
+      <div>
+        <div class="cc-stat-title">Disabled</div>
+        <div class="cc-stat-value text-danger">{{ stats.disabled_accounts }}</div>
+        <span class="small text-muted mt-2 d-inline-block">Suspended</span>
+      </div>
+      <div class="cc-stat-icon-wrapper cc-stat-icon-red">
+        <i class="bi bi-slash-circle-fill"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Navigation & Management Actions -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-8">
+    <div class="cc-card">
+      <div class="cc-card-header">
+        <h5 class="fw-bold mb-0">Role Management Directories</h5>
+        <span class="text-muted small">Manage accounts and permissions</span>
+      </div>
+      <div class="p-4">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="p-3 border rounded-3 bg-light text-center h-100 d-flex flex-column justify-content-between">
+              <div>
+                <i class="bi bi-mortarboard fs-1 text-primary mb-2 d-block"></i>
+                <h6 class="fw-bold">Students Directory</h6>
+                <p class="text-muted small mb-3">View and manage enrolled students, classes, and activation status.</p>
+              </div>
+              <a href="{{ url_for('admin.manage_students') }}" class="btn btn-outline-primary btn-sm w-100">Open Students</a>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 border rounded-3 bg-light text-center h-100 d-flex flex-column justify-content-between">
+              <div>
+                <i class="bi bi-briefcase fs-1 text-teal mb-2 d-block"></i>
+                <h6 class="fw-bold">Staff Directory</h6>
+                <p class="text-muted small mb-3">Manage faculty, academic staff, departments, and active access.</p>
+              </div>
+              <a href="{{ url_for('admin.manage_staff') }}" class="btn btn-outline-secondary btn-sm w-100">Open Staff</a>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 border rounded-3 bg-light text-center h-100 d-flex flex-column justify-content-between">
+              <div>
+                <i class="bi bi-house-door fs-1 text-warning mb-2 d-block"></i>
+                <h6 class="fw-bold">Parents Directory</h6>
+                <p class="text-muted small mb-3">Maintain verified parent profiles and student relationships.</p>
+              </div>
+              <a href="{{ url_for('admin.manage_parents') }}" class="btn btn-outline-warning btn-sm w-100">Open Parents</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="cc-card h-100">
+      <div class="cc-card-header">
+        <h5 class="fw-bold mb-0">System Architecture</h5>
+        <span class="badge bg-primary">Phase 1</span>
+      </div>
+      <div class="p-4">
+        <ul class="list-unstyled mb-0 d-flex flex-column gap-3 small">
+          <li class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-check text-success fs-5"></i>
+            <div>
+              <strong>Role-Based Access Control</strong>
+              <div class="text-muted">Strict server-side validation on every privileged route.</div>
+            </div>
+          </li>
+          <li class="d-flex align-items-center gap-2">
+            <i class="bi bi-person-badge text-primary fs-5"></i>
+            <div>
+              <strong>Deterministic Custom User IDs</strong>
+              <div class="text-muted">Collision-safe mapping between User IDs and Firebase Auth.</div>
+            </div>
+          </li>
+          <li class="d-flex align-items-center gap-2">
+            <i class="bi bi-cloud-arrow-up text-info fs-5"></i>
+            <div>
+              <strong>Cloud Firestore & Auth Integration</strong>
+              <div class="text-muted">Profiles, metadata, and token lifecycle managed server-side.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if stats.total_accounts == 0 %}
+  <!-- Empty State when database has 0 accounts -->
+  <div class="card p-5 text-center bg-white border rounded-3 shadow-sm mb-4">
+    <div class="cc-stat-icon-wrapper cc-stat-icon-blue mx-auto mb-3" style="width: 64px; height: 64px; font-size: 2rem;">
+      <i class="bi bi-inbox"></i>
+    </div>
+    <h4 class="fw-bold">No Registered Accounts Yet</h4>
+    <p class="text-muted mx-auto" style="max-width: 480px;">
+      The Firestore database currently has no non-admin user records. You can run the administrator initialization script or click below to start provisioning accounts.
+    </p>
+    <div class="mt-3">
+      <a href="{{ url_for('admin.create_account') }}" class="btn btn-primary">
+        <i class="bi bi-person-plus-fill me-1"></i> Create First Account
+      </a>
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}

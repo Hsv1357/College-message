@@ -1,0 +1,437 @@
+/* ==========================================================================
+   CampusConnect - Main Stylesheet
+   Modern, accessible, responsive college administration interface
+   ========================================================================== */
+
+:root {
+  --cc-primary: #1e3a8a;       /* Deep Navy */
+  --cc-primary-light: #2563eb; /* Cobalt Blue */
+  --cc-primary-dark: #0f172a;  /* Midnight Slate */
+  --cc-secondary: #0d9488;     /* Teal Accent */
+  --cc-accent: #f59e0b;        /* Amber */
+  --cc-success: #10b981;       /* Emerald */
+  --cc-danger: #ef4444;        /* Crimson */
+  --cc-warning: #f59e0b;
+  --cc-bg-main: #f8fafc;       /* Slate 50 */
+  --cc-card-bg: #ffffff;
+  --cc-sidebar-bg: #0f172a;    /* Dark Slate */
+  --cc-sidebar-text: #94a3b8;
+  --cc-sidebar-hover: #1e293b;
+  --cc-border-color: #e2e8f0;
+  --cc-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  font-family: var(--cc-font-family);
+  background-color: var(--cc-bg-main);
+  color: #334155;
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   Navigation & Sidebar Layout
+   ========================================================================== */
+.cc-app-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.cc-sidebar {
+  width: 260px;
+  background-color: var(--cc-sidebar-bg);
+  color: var(--cc-sidebar-text);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.cc-sidebar-brand {
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cc-brand-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--cc-primary-light), var(--cc-secondary));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.cc-sidebar-nav {
+  padding: 1.25rem 0.75rem;
+  list-style: none;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.cc-nav-item {
+  margin-bottom: 0.35rem;
+}
+
+.cc-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+  color: var(--cc-sidebar-text);
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.cc-nav-link:hover {
+  background-color: var(--cc-sidebar-hover);
+  color: #ffffff;
+}
+
+.cc-nav-link.active {
+  background-color: var(--cc-primary-light);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.cc-nav-link svg, .cc-nav-link i {
+  font-size: 1.15rem;
+  width: 20px;
+  text-align: center;
+}
+
+.cc-sidebar-footer {
+  padding: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cc-main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background-color: var(--cc-bg-main);
+}
+
+.cc-topbar {
+  height: 70px;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--cc-border-color);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cc-page-container {
+  padding: 2rem;
+  flex-grow: 1;
+}
+
+/* ==========================================================================
+   Dashboard Cards & Widgets
+   ========================================================================== */
+.cc-stat-card {
+  background: var(--cc-card-bg);
+  border: 1px solid var(--cc-border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cc-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+}
+
+.cc-stat-title {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.5rem;
+}
+
+.cc-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.cc-stat-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.cc-stat-icon-blue {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.cc-stat-icon-teal {
+  background-color: #f0fdfa;
+  color: #0d9488;
+}
+
+.cc-stat-icon-amber {
+  background-color: #fefce8;
+  color: #d97706;
+}
+
+.cc-stat-icon-green {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+.cc-stat-icon-red {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+/* ==========================================================================
+   Tables & Data Presentation
+   ========================================================================== */
+.cc-card {
+  background: var(--cc-card-bg);
+  border: 1px solid var(--cc-border-color);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.cc-card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--cc-border-color);
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cc-table {
+  width: 100%;
+  margin-bottom: 0;
+  border-collapse: collapse;
+}
+
+.cc-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--cc-border-color);
+}
+
+.cc-table td {
+  padding: 1rem 1.5rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.925rem;
+}
+
+.cc-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Badges */
+.cc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.cc-badge-active {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.cc-badge-disabled {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.cc-badge-role {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   Login Page Styling
+   ========================================================================== */
+.cc-login-body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.cc-login-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cc-login-header {
+  padding: 2.25rem 2rem 1.5rem 2rem;
+  text-align: center;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.cc-login-logo {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 1rem auto;
+  background: linear-gradient(135deg, var(--cc-primary), var(--cc-primary-light));
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.8rem;
+  box-shadow: 0 8px 16px rgba(30, 58, 138, 0.25);
+}
+
+.cc-login-body-content {
+  padding: 2rem;
+}
+
+/* ==========================================================================
+   Form Controls & Buttons
+   ========================================================================== */
+.form-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #334155;
+  margin-bottom: 0.4rem;
+}
+
+.form-control, .form-select {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--cc-primary-light);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  outline: none;
+}
+
+.btn-primary {
+  background-color: var(--cc-primary-light);
+  border-color: var(--cc-primary-light);
+  padding: 0.7rem 1.25rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--cc-primary);
+  border-color: var(--cc-primary);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+}
+
+/* Password Toggle Wrapper */
+.cc-password-group {
+  position: relative;
+}
+
+.cc-password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.cc-password-toggle:hover {
+  color: #1e293b;
+}
+
+/* Loading Spinner Overlay */
+.cc-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+  vertical-align: -0.125em;
+}
+
+/* Responsive tweaks */
+@media (max-width: 992px) {
+  .cc-sidebar {
+    position: fixed;
+    left: -260px;
+    height: 100vh;
+  }
+  .cc-sidebar.open {
+    left: 0;
+  }
+  .cc-topbar {
+    padding: 0 1rem;
+  }
+  .cc-page-container {
+    padding: 1rem;
+  }
+}

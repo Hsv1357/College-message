@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Parents — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+  <div>
+    <h1 class="h3 fw-bold text-dark mb-1">Parent Management</h1>
+    <p class="text-muted mb-0">View, search, and manage registered parent accounts and student linkages</p>
+  </div>
+  <a href="{{ url_for('admin.create_account', role='parent') }}" class="btn btn-primary d-flex align-items-center gap-2">
+    <i class="bi bi-person-plus-fill"></i>
+    <span>Add New Parent</span>
+  </a>
+</div>
+
+<!-- Search and Filter Bar -->
+<div class="cc-card mb-4 p-3">
+  <form method="GET" action="{{ url_for('admin.manage_parents') }}" class="row g-2 align-items-center">
+    <div class="col-md-7">
+      <div class="input-group">
+        <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
+        <input
+          type="text"
+          class="form-control border-start-0"
+          name="q"
+          placeholder="Search parents by User ID or Name..."
+          value="{{ search_query or '' }}"
+        >
+      </div>
+    </div>
+    <div class="col-md-3">
+      <select name="status" class="form-select">
+        <option value="all" {% if selected_status == 'all' %}selected{% endif %}>All Statuses</option>
+        <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+        <option value="disabled" {% if selected_status == 'disabled' %}selected{% endif %}>Disabled</option>
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-primary w-100">Filter</button>
+      {% if search_query or (selected_status and selected_status != 'all') %}
+        <a href="{{ url_for('admin.manage_parents') }}" class="btn btn-outline-secondary" title="Clear Filters">
+          <i class="bi bi-x-lg"></i>
+        </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<!-- Parents Data Table -->
+<div class="cc-card">
+  <div class="cc-card-header">
+    <div class="fw-bold">Registered Parents ({{ parents | length }})</div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="cc-table">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Full Name</th>
+          <th>Contact Email</th>
+          <th>Phone</th>
+          <th>Associated Students (User IDs)</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if parents %}
+          {% for parent in parents %}
+            <tr>
+              <td>
+                <span class="fw-bold text-dark">{{ parent.user_id }}</span>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ parent.full_name }}</div>
+              </td>
+              <td>{{ parent.email or '—' }}</td>
+              <td>{{ parent.phone or '—' }}</td>
+              <td>
+                {% if parent.parent_student_ids %}
+                  <div class="d-flex flex-wrap gap-1">
+                    {% for sid in parent.parent_student_ids %}
+                      <span class="badge bg-light text-dark border">{{ sid }}</span>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <span class="text-muted small">None linked</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if parent.account_status == 'active' %}
+                  <span class="cc-badge cc-badge-active">
+                    <i class="bi bi-check-circle-fill"></i> Active
+                  </span>
+                {% else %}
+                  <span class="cc-badge cc-badge-disabled">
+                    <i class="bi bi-slash-circle-fill"></i> Disabled
+                  </span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <div class="d-inline-flex gap-2 align-items-center">
+                  <!-- Edit Profile Button -->
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editUserModal"
+                    data-uid="{{ parent.uid }}"
+                    data-userid="{{ parent.user_id }}"
+                    data-fullname="{{ parent.full_name }}"
+                    data-email="{{ parent.email }}"
+                    data-phone="{{ parent.phone }}"
+                    data-parentstudentids="{{ parent.parent_student_ids | join(', ') }}"
+                    title="Edit Parent Information"
+                  >
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+
+                  <!-- Toggle Status Form with confirmation -->
+                  <form action="{{ url_for('admin.change_status', uid=parent.uid) }}" method="POST" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if parent.account_status == 'active' %}
+                      <input type="hidden" name="status" value="disabled">
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="return confirm('Are you sure you want to deactivate parent account {{ parent.user_id }}?');"
+                        title="Deactivate Account"
+                      >
+                        <i class="bi bi-person-x-fill"></i>
+                      </button>
+                    {% else %}
+                      <input type="hidden" name="status" value="active">
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-success"
+                        onclick="return confirm('Are you sure you want to re-enable parent account {{ parent.user_id }}?');"
+                        title="Activate Account"
+                      >
+                        <i class="bi bi-person-check-fill"></i>
+                      </button>
+                    {% endif %}
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center py-5">
+              <div class="text-muted">
+                <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                <p class="mb-2 fw-semibold">No parent records found matching your criteria.</p>
+                <a href="{{ url_for('admin.create_account', role='parent') }}" class="btn btn-primary btn-sm">
+                  <i class="bi bi-person-plus-fill me-1"></i> Register a Parent
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="editUserForm" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="editUserModalLabel">
+            Edit Parent: <span id="modalUserId" class="text-primary"></span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="modalFullName" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="modalFullName" name="full_name" required>
+          </div>
+          <div class="mb-3">
+            <label for="modalEmail" class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="modalEmail" name="email">
+          </div>
+          <div class="mb-3">
+            <label for="modalPhone" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" id="modalPhone" name="phone">
+          </div>
+          <div class="mb-3">
+            <label for="modalParentStudentIds" class="form-label">Associated Student User IDs</label>
+            <input type="text" class="form-control" id="modalParentStudentIds" name="parent_student_ids" placeholder="e.g. STU-1001, STU-1002">
+            <div class="form-text text-muted small">Separate multiple student IDs with commas.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

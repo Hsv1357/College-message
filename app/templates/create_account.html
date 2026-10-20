@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+      <div>
+        <h1 class="h3 fw-bold text-dark mb-1">Provision New Account</h1>
+        <p class="text-muted mb-0">Create authenticated user profiles across college roles</p>
+      </div>
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+      </a>
+    </div>
+
+    <div class="cc-card">
+      <div class="cc-card-header bg-light">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-shield-lock-fill text-primary"></i>
+          <span class="fw-bold">Account Registration Form</span>
+        </div>
+        <span class="badge bg-secondary">Phase 1 Auth Provisioning</span>
+      </div>
+
+      <div class="p-4">
+        <form action="{{ url_for('admin.create_account') }}" method="POST" class="cc-loading-form" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <!-- Role Selection -->
+          <div class="mb-4">
+            <label for="accountRoleSelect" class="form-label">Account Role <span class="text-danger">*</span></label>
+            <select class="form-select form-select-lg" id="accountRoleSelect" name="role" required>
+              <option value="student" {% if form_data.role == 'student' %}selected{% endif %}>Student</option>
+              <option value="staff" {% if form_data.role == 'staff' %}selected{% endif %}>Faculty / Staff</option>
+              <option value="parent" {% if form_data.role == 'parent' %}selected{% endif %}>Parent</option>
+            </select>
+            <div class="form-text text-muted small">Select the role to customize available profile attributes.</div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <!-- User ID -->
+            <div class="col-md-6">
+              <label for="user_id" class="form-label">Application User ID <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="bi bi-person-badge"></i></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="user_id"
+                  name="user_id"
+                  placeholder="e.g. STU-2024-001 or STF-102"
+                  value="{{ form_data.user_id or '' }}"
+                  required
+                >
+              </div>
+              <div class="form-text text-muted small">Unique identifier used for logging into the portal.</div>
+            </div>
+
+            <!-- Full Name -->
+            <div class="col-md-6">
+              <label for="full_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="full_name"
+                  name="full_name"
+                  placeholder="e.g. Alice Johnson"
+                  value="{{ form_data.full_name or '' }}"
+                  required
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="mb-3">
+            <label for="new_password" class="form-label">Initial Password <span class="text-danger">*</span></label>
+            <div class="cc-password-group">
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-lock"></i></span>
+                <input
+                  type="password"
+                  class="form-control border-start-0 pe-5"
+                  id="new_password"
+                  name="password"
+                  placeholder="Minimum 6 characters"
+                  required
+                  minlength="6"
+                >
+              </div>
+              <button
+                type="button"
+                class="cc-password-toggle"
+                data-target="new_password"
+                aria-label="Toggle password visibility"
+              >
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            <div class="form-text text-muted small">Managed securely via Firebase Authentication. Minimum 6 characters.</div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <!-- Contact Email -->
+            <div class="col-md-6">
+              <label for="email" class="form-label">Contact Email Address</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="bi bi-envelope"></i></span>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  placeholder="user@college.edu or personal"
+                  value="{{ form_data.email or '' }}"
+                >
+              </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="col-md-6">
+              <label for="phone" class="form-label">Phone Number</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="bi bi-telephone"></i></span>
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="phone"
+                  name="phone"
+                  placeholder="+1 (555) 000-0000"
+                  value="{{ form_data.phone or '' }}"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Student & Staff: Department Field -->
+          <div class="mb-3 role-field-student role-field-staff">
+            <label for="department" class="form-label">Department</label>
+            <select class="form-select" id="department" name="department">
+              <option value="">Select Department (Optional)</option>
+              <option value="Computer Science" {% if form_data.department == 'Computer Science' %}selected{% endif %}>Computer Science</option>
+              <option value="Information Technology" {% if form_data.department == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+              <option value="Electronics & Communication" {% if form_data.department == 'Electronics & Communication' %}selected{% endif %}>Electronics & Communication</option>
+              <option value="Mechanical Engineering" {% if form_data.department == 'Mechanical Engineering' %}selected{% endif %}>Mechanical Engineering</option>
+              <option value="Civil Engineering" {% if form_data.department == 'Civil Engineering' %}selected{% endif %}>Civil Engineering</option>
+              <option value="Mathematics & Sciences" {% if form_data.department == 'Mathematics & Sciences' %}selected{% endif %}>Mathematics & Sciences</option>
+              <option value="Administration" {% if form_data.department == 'Administration' %}selected{% endif %}>Administration</option>
+            </select>
+          </div>
+
+          <!-- Student: Class / Section Field -->
+          <div class="mb-3 role-field-student">
+            <label for="class_name" class="form-label">Class / Section / Year</label>
+            <input
+              type="text"
+              class="form-control"
+              id="class_name"
+              name="class_name"
+              placeholder="e.g. CSE 3rd Year - Section A"
+              value="{{ form_data.class_name or '' }}"
+            >
+          </div>
+
+          <!-- Parent: Associated Student IDs Field -->
+          <div class="mb-3 role-field-parent">
+            <label for="parent_student_ids" class="form-label">Associated Student User IDs</label>
+            <input
+              type="text"
+              class="form-control"
+              id="parent_student_ids"
+              name="parent_student_ids"
+              placeholder="e.g. STU-2024-001, STU-2024-002"
+              value="{{ form_data.parent_student_ids or '' }}"
+            >
+            <div class="form-text text-muted small">Enter one or more valid Student User IDs, comma-separated.</div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-person-check-fill me-1"></i> Create Account
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

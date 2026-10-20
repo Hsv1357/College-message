@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Staff — CampusConnect{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+  <div>
+    <h1 class="h3 fw-bold text-dark mb-1">Staff Management</h1>
+    <p class="text-muted mb-0">View, search, and manage faculty and staff accounts</p>
+  </div>
+  <a href="{{ url_for('admin.create_account', role='staff') }}" class="btn btn-primary d-flex align-items-center gap-2">
+    <i class="bi bi-person-plus-fill"></i>
+    <span>Add New Staff</span>
+  </a>
+</div>
+
+<!-- Search and Filter Bar -->
+<div class="cc-card mb-4 p-3">
+  <form method="GET" action="{{ url_for('admin.manage_staff') }}" class="row g-2 align-items-center">
+    <div class="col-md-5">
+      <div class="input-group">
+        <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
+        <input
+          type="text"
+          class="form-control border-start-0"
+          name="q"
+          placeholder="Search staff by User ID or Name..."
+          value="{{ search_query or '' }}"
+        >
+      </div>
+    </div>
+    <div class="col-md-3">
+      <select name="department" class="form-select">
+        <option value="all" {% if selected_department == 'all' %}selected{% endif %}>All Departments</option>
+        <option value="Computer Science" {% if selected_department == 'Computer Science' %}selected{% endif %}>Computer Science</option>
+        <option value="Information Technology" {% if selected_department == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+        <option value="Electronics & Communication" {% if selected_department == 'Electronics & Communication' %}selected{% endif %}>Electronics & Communication</option>
+        <option value="Mechanical Engineering" {% if selected_department == 'Mechanical Engineering' %}selected{% endif %}>Mechanical Engineering</option>
+        <option value="Mathematics & Sciences" {% if selected_department == 'Mathematics & Sciences' %}selected{% endif %}>Mathematics & Sciences</option>
+        <option value="Administration" {% if selected_department == 'Administration' %}selected{% endif %}>Administration</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="all" {% if selected_status == 'all' %}selected{% endif %}>All Statuses</option>
+        <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+        <option value="disabled" {% if selected_status == 'disabled' %}selected{% endif %}>Disabled</option>
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-primary w-100">Filter</button>
+      {% if search_query or (selected_department and selected_department != 'all') or (selected_status and selected_status != 'all') %}
+        <a href="{{ url_for('admin.manage_staff') }}" class="btn btn-outline-secondary" title="Clear Filters">
+          <i class="bi bi-x-lg"></i>
+        </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<!-- Staff Data Table -->
+<div class="cc-card">
+  <div class="cc-card-header">
+    <div class="fw-bold">Faculty & Staff Members ({{ staff_list | length }})</div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="cc-table">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Full Name</th>
+          <th>Department</th>
+          <th>Contact Email</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if staff_list %}
+          {% for staff in staff_list %}
+            <tr>
+              <td>
+                <span class="fw-bold text-dark">{{ staff.user_id }}</span>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ staff.full_name }}</div>
+              </td>
+              <td>{{ staff.department or '—' }}</td>
+              <td>{{ staff.email or '—' }}</td>
+              <td>{{ staff.phone or '—' }}</td>
+              <td>
+                {% if staff.account_status == 'active' %}
+                  <span class="cc-badge cc-badge-active">
+                    <i class="bi bi-check-circle-fill"></i> Active
+                  </span>
+                {% else %}
+                  <span class="cc-badge cc-badge-disabled">
+                    <i class="bi bi-slash-circle-fill"></i> Disabled
+                  </span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <div class="d-inline-flex gap-2 align-items-center">
+                  <!-- Edit Profile Button -->
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editUserModal"
+                    data-uid="{{ staff.uid }}"
+                    data-userid="{{ staff.user_id }}"
+                    data-fullname="{{ staff.full_name }}"
+                    data-email="{{ staff.email }}"
+                    data-phone="{{ staff.phone }}"
+                    data-department="{{ staff.department }}"
+                    title="Edit Staff Information"
+                  >
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+
+                  <!-- Toggle Status Form with confirmation -->
+                  <form action="{{ url_for('admin.change_status', uid=staff.uid) }}" method="POST" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if staff.account_status == 'active' %}
+                      <input type="hidden" name="status" value="disabled">
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="return confirm('Are you sure you want to deactivate staff member {{ staff.user_id }}?');"
+                        title="Deactivate Account"
+                      >
+                        <i class="bi bi-person-x-fill"></i>
+                      </button>
+                    {% else %}
+                      <input type="hidden" name="status" value="active">
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-outline-success"
+                        onclick="return confirm('Are you sure you want to re-enable staff member {{ staff.user_id }}?');"
+                        title="Activate Account"
+                      >
+                        <i class="bi bi-person-check-fill"></i>
+                      </button>
+                    {% endif %}
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center py-5">
+              <div class="text-muted">
+                <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                <p class="mb-2 fw-semibold">No staff records found matching your criteria.</p>
+                <a href="{{ url_for('admin.create_account', role='staff') }}" class="btn btn-primary btn-sm">
+                  <i class="bi bi-person-plus-fill me-1"></i> Register a Staff Member
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="editUserForm" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="editUserModalLabel">
+            Edit Staff: <span id="modalUserId" class="text-primary"></span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="modalFullName" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="modalFullName" name="full_name" required>
+          </div>
+          <div class="mb-3">
+            <label for="modalEmail" class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="modalEmail" name="email">
+          </div>
+          <div class="mb-3">
+            <label for="modalPhone" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" id="modalPhone" name="phone">
+          </div>
+          <div class="mb-3">
+            <label for="modalDepartment" class="form-label">Department</label>
+            <input type="text" class="form-control" id="modalDepartment" name="department">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
